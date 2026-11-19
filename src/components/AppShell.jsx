@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
-import { Disc3, LogOut } from 'lucide-react'
+import { Link, Outlet } from 'react-router-dom'
+import { LogOut, Music } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../player/PlayerProvider'
 import MiniPlayer from './MiniPlayer'
@@ -9,7 +9,6 @@ import FullPlayer from './FullPlayer'
 export default function AppShell() {
   const { mix } = usePlayer()
   const [fullOpen, setFullOpen] = useState(false)
-  const location = useLocation()
 
   async function handleLogout() {
     if (window.confirm('Bạn có chắc muốn đăng xuất?')) {
@@ -19,31 +18,28 @@ export default function AppShell() {
 
   return (
     <div
-      className="flex min-h-dvh flex-col bg-black text-white antialiased selection:bg-zinc-800 selection:text-white"
+      className="flex min-h-dvh flex-col bg-black text-white antialiased"
       style={{ minHeight: '100dvh' }}
     >
-      {/* Header kính mờ cố định phong cách iOS */}
+      {/* Header kính mờ tĩnh, tối giản */}
       <header
-        className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-900/80 bg-black/80 px-4 backdrop-blur-xl transition-all"
+        className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-900 bg-black/90 px-4 backdrop-blur-md"
         style={{
           paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)',
           paddingBottom: '8px',
-          minHeight: '60px',
+          minHeight: '56px',
         }}
       >
-        <Link
-          to="/"
-          className="flex items-center gap-2.5 transition-opacity hover:opacity-80 active:scale-95"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-850 bg-zinc-950 text-white shadow-sm">
-            <Disc3 size={18} className="animate-[spin_12s_linear_infinite]" />
+        <Link to="/" className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 text-white">
+            <Music size={14} />
           </div>
           <span className="text-base font-semibold tracking-tight text-white">Nhạc</span>
         </Link>
 
         <button
           onClick={handleLogout}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-500 transition-colors hover:text-white"
           aria-label="Đăng xuất"
           title="Đăng xuất"
         >
@@ -63,10 +59,10 @@ export default function AppShell() {
         <Outlet />
       </main>
 
-      {/* MiniPlayer dạng Floating Bar */}
+      {/* MiniPlayer */}
       <MiniPlayer onOpenFull={() => setFullOpen(true)} />
 
-      {/* FullPlayer Bottom Sheet */}
+      {/* FullPlayer */}
       <FullPlayer isOpen={fullOpen} onClose={() => setFullOpen(false)} />
     </div>
   )

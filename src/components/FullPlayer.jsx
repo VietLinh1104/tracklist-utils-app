@@ -1,15 +1,14 @@
 /**
- * FullPlayer — Bottom Sheet phủ toàn màn hình chuẩn mobile-first.
- * Thẩm mỹ đen trắng tối giản, đĩa than xoay theo trạng thái phát,
- * thanh tua HeroUI Slider v3, các nút điều khiển lớn >= 48px,
- * sóng âm equalizer animation cho bài đang phát trong tracklist.
+ * FullPlayer — Bottom Sheet phủ toàn màn hình.
+ * Phong cách tĩnh và đơn giản: icon nốt nhạc tĩnh, bài đang phát đậm hơn,
+ * thanh tua tinh tế, các nút bấm dễ chạm.
  */
 import { useEffect, useRef, useState } from 'react'
 import { Modal, Slider } from '@heroui/react'
 import {
   ChevronDown,
-  Disc3,
   ListMusic,
+  Music,
   Pause,
   Play,
   Repeat,
@@ -101,60 +100,41 @@ export default function FullPlayer({ isOpen, onClose }) {
           }}
           aria-label="Full player"
         >
-          {/* Grab handle indicator & Header */}
-          <div className="flex flex-col border-b border-zinc-900/60 px-4 pt-2 pb-3">
-            <div className="mx-auto mb-2 h-1.5 w-10 rounded-full bg-zinc-800" />
+          {/* Header */}
+          <div className="flex flex-col border-b border-zinc-900 px-4 pt-2 pb-3">
+            <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-zinc-800" />
             <div className="flex items-center justify-between">
               <button
                 onClick={onClose}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white active:scale-95"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-zinc-500 hover:text-white"
                 aria-label="Thu nhỏ"
               >
-                <ChevronDown size={24} />
+                <ChevronDown size={22} />
               </button>
 
               <div className="min-w-0 flex-1 px-2 text-center">
-                <p className="text-[11px] font-semibold tracking-wider text-zinc-500 uppercase">
-                  ĐANG PHÁT TỪ SET
-                </p>
-                <p className="truncate text-sm font-medium text-zinc-200">{mix.title}</p>
+                <p className="truncate text-xs font-medium text-zinc-400">{mix.title}</p>
               </div>
 
               <div className="w-11" />
             </div>
           </div>
 
-          {/* Body có thể cuộn linh hoạt */}
+          {/* Body */}
           <div className="flex flex-1 flex-col justify-between overflow-y-auto px-6 py-6">
-            {/* Ảnh bìa đĩa than lớn xoay theo nhạc */}
-            <div className="flex flex-1 items-center justify-center py-2">
-              <div className="relative flex aspect-square w-full max-w-[280px] items-center justify-center rounded-3xl border border-zinc-850 bg-gradient-to-b from-zinc-900 to-black p-4 shadow-2xl">
-                {/* Vòng rãnh đĩa than Vinyl */}
-                <div
-                  className={[
-                    'relative flex aspect-square w-full items-center justify-center rounded-full border-4 border-zinc-800/80 bg-zinc-950 shadow-inner',
-                    isPlaying ? 'animate-[spin_16s_linear_infinite]' : '',
-                  ].join(' ')}
-                >
-                  {/* Các rãnh concentric vinyl */}
-                  <div className="absolute inset-4 rounded-full border border-zinc-900" />
-                  <div className="absolute inset-10 rounded-full border border-zinc-900/60" />
-                  <div className="absolute inset-16 rounded-full border border-zinc-850/80" />
-
-                  {/* Tâm đĩa than */}
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/20 bg-zinc-900">
-                    <Disc3 size={28} className="text-white" />
-                  </div>
-                </div>
+            {/* Ảnh bìa tĩnh: khung tối giản với nốt nhạc */}
+            <div className="flex flex-1 items-center justify-center py-4">
+              <div className="flex aspect-square w-full max-w-[240px] items-center justify-center rounded-2xl border border-zinc-850 bg-zinc-950 shadow-lg">
+                <Music size={48} className="text-zinc-600" />
               </div>
             </div>
 
             {/* Thông tin track hiện tại */}
-            <div className="mt-4 w-full text-center">
-              <h2 className="truncate text-xl font-bold tracking-tight text-white sm:text-2xl">
+            <div className="mt-2 w-full text-center">
+              <h2 className="truncate text-xl font-bold tracking-tight text-white">
                 {curTrack?.name ?? mix.title}
               </h2>
-              <p className="mt-1 truncate text-sm font-medium text-zinc-400">
+              <p className="mt-1 truncate text-sm text-zinc-400">
                 {curTrack?.artist || mix.title}
               </p>
             </div>
@@ -176,7 +156,7 @@ export default function FullPlayer({ isOpen, onClose }) {
               >
                 <Slider.Track className="h-1.5 bg-zinc-850">
                   <Slider.Fill className="bg-white" />
-                  <Slider.Thumb className="h-4 w-4 border-2 border-black bg-white shadow-md" />
+                  <Slider.Thumb className="h-4 w-4 border-2 border-black bg-white shadow-sm" />
                 </Slider.Track>
               </Slider>
               <div className="mt-1.5 flex justify-between font-mono text-xs text-zinc-500 tabular-nums">
@@ -187,66 +167,58 @@ export default function FullPlayer({ isOpen, onClose }) {
 
             {/* Cụm điều khiển phát chính */}
             <div className="mt-6 flex w-full items-center justify-between px-2">
-              {/* Nút Repeat */}
               <button
                 onClick={cycleRepeat}
                 className={[
-                  'relative flex h-12 w-12 items-center justify-center rounded-full transition-colors active:scale-90',
+                  'flex h-12 w-12 items-center justify-center rounded-full transition-colors',
                   repeatActive ? 'text-white' : 'text-zinc-600 hover:text-zinc-400',
                 ].join(' ')}
                 aria-label={`Lặp: ${repeat}`}
                 title={`Chế độ lặp: ${repeat}`}
               >
                 {repeatIcon}
-                {repeatActive && (
-                  <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-white" />
-                )}
               </button>
 
-              {/* Nút Trước (⏮) */}
               <button
                 onClick={prev}
-                className="flex h-14 w-14 items-center justify-center text-white transition-transform active:scale-90"
+                className="flex h-14 w-14 items-center justify-center text-white active:scale-95"
                 aria-label="Bài trước"
               >
-                <SkipBack size={32} />
+                <SkipBack size={30} />
               </button>
 
-              {/* Nút Play/Pause tròn to nổi bật */}
               <button
                 onClick={togglePlay}
-                className="flex h-18 w-18 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform active:scale-95"
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-black shadow-lg active:scale-95"
                 aria-label={isPlaying ? 'Tạm dừng' : 'Phát'}
               >
                 {isPlaying ? (
-                  <Pause size={30} fill="black" />
+                  <Pause size={28} fill="black" />
                 ) : (
-                  <Play size={30} fill="black" className="ml-1" />
+                  <Play size={28} fill="black" className="ml-1" />
                 )}
               </button>
 
-              {/* Nút Sau (⏭) */}
               <button
                 onClick={next}
-                className="flex h-14 w-14 items-center justify-center text-white transition-transform active:scale-90"
+                className="flex h-14 w-14 items-center justify-center text-white active:scale-95"
                 aria-label="Bài sau"
               >
-                <SkipForward size={32} />
+                <SkipForward size={30} />
               </button>
 
-              {/* Icon giữ layout đối xứng */}
               <div className="flex h-12 w-12 items-center justify-center text-zinc-600">
                 <ListMusic size={20} />
               </div>
             </div>
 
-            {/* Danh sách các track bên trong FullPlayer */}
+            {/* Danh sách track bên dưới (chỉ in đậm bài đang chạy) */}
             <div className="mt-8 w-full border-t border-zinc-900 pt-4">
-              <p className="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+              <p className="mb-2 text-xs font-medium text-zinc-500">
                 DANH SÁCH BÀI ({tracks.length})
               </p>
               <div className="max-h-48 overflow-y-auto overscroll-contain pr-1">
-                <TrackList tracks={tracks} curIdx={curIdx} isPlaying={isPlaying} />
+                <TrackList tracks={tracks} curIdx={curIdx} />
               </div>
             </div>
           </div>
@@ -256,7 +228,7 @@ export default function FullPlayer({ isOpen, onClose }) {
   )
 }
 
-function TrackList({ tracks, curIdx, isPlaying }) {
+function TrackList({ tracks, curIdx }) {
   const { playTrack } = usePlayer()
   if (!tracks.length) return null
 
@@ -269,35 +241,46 @@ function TrackList({ tracks, curIdx, isPlaying }) {
             <button
               onClick={() => playTrack(i)}
               className={[
-                'flex w-full min-h-[46px] items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors',
-                isCurrent
-                  ? 'bg-zinc-900/80 text-white'
-                  : 'text-zinc-400 hover:bg-zinc-950 hover:text-zinc-200',
+                'flex w-full min-h-[44px] items-center gap-3 px-2 py-2 text-left transition-colors',
+                isCurrent ? 'text-white' : 'text-zinc-500 hover:text-zinc-300',
               ].join(' ')}
             >
-              {/* Chỉ báo sóng âm equalizer cho bài đang phát */}
-              <div className="flex w-6 shrink-0 items-center justify-center text-xs font-mono tabular-nums text-zinc-600">
-                {isCurrent && isPlaying ? (
-                  <div className="flex items-end gap-[2px] h-3">
-                    <span className="w-1 bg-white animate-[pulse_0.6s_ease-in-out_infinite] h-3 rounded-full" />
-                    <span className="w-1 bg-white animate-[pulse_0.4s_ease-in-out_infinite] h-2 rounded-full" />
-                    <span className="w-1 bg-white animate-[pulse_0.8s_ease-in-out_infinite] h-2.5 rounded-full" />
-                  </div>
-                ) : (
-                  <span>{String(i + 1).padStart(2, '0')}</span>
-                )}
-              </div>
+              <span
+                className={[
+                  'w-6 shrink-0 text-xs font-mono tabular-nums',
+                  isCurrent ? 'font-bold text-white' : 'text-zinc-600',
+                ].join(' ')}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
 
               <div className="min-w-0 flex-1">
-                <p className={['truncate text-sm', isCurrent ? 'font-semibold text-white' : ''].join(' ')}>
+                <p
+                  className={[
+                    'truncate text-sm',
+                    isCurrent ? 'font-bold text-white' : 'font-normal',
+                  ].join(' ')}
+                >
                   {t.name}
                 </p>
                 {t.artist && (
-                  <p className="truncate text-xs text-zinc-500">{t.artist}</p>
+                  <p
+                    className={[
+                      'truncate text-xs',
+                      isCurrent ? 'text-zinc-300' : 'text-zinc-600',
+                    ].join(' ')}
+                  >
+                    {t.artist}
+                  </p>
                 )}
               </div>
 
-              <span className="shrink-0 text-xs font-mono tabular-nums text-zinc-600">
+              <span
+                className={[
+                  'shrink-0 text-xs font-mono tabular-nums',
+                  isCurrent ? 'text-zinc-300' : 'text-zinc-600',
+                ].join(' ')}
+              >
                 {formatTime(t.start_seconds)}
               </span>
             </button>

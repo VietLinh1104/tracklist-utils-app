@@ -4,10 +4,9 @@ import { Button, Modal } from '@heroui/react'
 import {
   AlertCircle,
   ChevronLeft,
-  Disc3,
   ListPlus,
+  Music,
   Play,
-  Share2,
   Trash2,
   X,
 } from 'lucide-react'
@@ -18,7 +17,7 @@ import { parseTracklist, formatTime } from '../lib/tracklist'
 export default function MixDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { playMix, mix: activeMix, curIdx, isPlaying, playTrack } = usePlayer()
+  const { playMix, mix: activeMix, curIdx, playTrack } = usePlayer()
 
   const [mix, setMix] = useState(null)
   const [tracks, setTracks] = useState([])
@@ -104,11 +103,11 @@ export default function MixDetailPage() {
       <div className="flex flex-col gap-4 py-12">
         <button
           onClick={() => navigate('/')}
-          className="flex w-fit items-center gap-1.5 text-xs text-zinc-400 hover:text-white"
+          className="flex w-fit items-center gap-1 text-xs text-zinc-400 hover:text-white"
         >
           <ChevronLeft size={16} /> Quay lại Thư viện
         </button>
-        <div className="rounded-2xl border border-red-900/60 bg-red-950/40 p-4 text-xs text-red-300">
+        <div className="rounded-xl border border-red-900/60 bg-red-950/40 p-4 text-xs text-red-300">
           {error || 'Không tìm thấy dữ liệu.'}
         </div>
       </div>
@@ -117,7 +116,7 @@ export default function MixDetailPage() {
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-6 pb-8">
-      {/* Nút quay lại */}
+      {/* Header điều hướng */}
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"
@@ -129,7 +128,7 @@ export default function MixDetailPage() {
           <span>Thư viện</span>
         </Button>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -154,49 +153,39 @@ export default function MixDetailPage() {
         </div>
       </div>
 
-      {/* Album Header & Bìa đĩa vinyl lớn */}
+      {/* Ảnh bìa tĩnh & Tiêu đề */}
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="relative flex aspect-square w-48 items-center justify-center rounded-3xl border border-zinc-850 bg-gradient-to-b from-zinc-900 to-black p-4 shadow-2xl">
-          <div
-            className={[
-              'relative flex aspect-square w-full items-center justify-center rounded-full border-4 border-zinc-800/80 bg-zinc-950 shadow-inner',
-              isActiveMix && isPlaying ? 'animate-[spin_12s_linear_infinite]' : '',
-            ].join(' ')}
-          >
-            <div className="absolute inset-3 rounded-full border border-zinc-900" />
-            <div className="absolute inset-8 rounded-full border border-zinc-900/60" />
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-white/20 bg-zinc-900 text-white">
-              <Disc3 size={24} />
-            </div>
-          </div>
+        {/* Khung bìa nốt nhạc tĩnh */}
+        <div className="flex aspect-square w-40 items-center justify-center rounded-2xl border border-zinc-850 bg-zinc-950 shadow-md">
+          <Music size={44} className="text-zinc-600" />
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">{mix.title}</h1>
+          <h1 className="text-xl font-bold tracking-tight text-white">{mix.title}</h1>
           <p className="mt-1 text-xs text-zinc-500 font-medium">
-            {tracks.length} bài hát · Tổng thời lượng {formatTime(mix.duration_seconds)}
+            {tracks.length} bài · {formatTime(mix.duration_seconds)}
           </p>
         </div>
 
-        {/* Nút to: Phát toàn bộ set */}
+        {/* Nút phát toàn bộ */}
         <Button
           onPress={handlePlayAll}
-          className="min-h-[48px] min-w-[200px] gap-2 rounded-full font-semibold shadow-xl active:scale-95"
+          className="min-h-[46px] min-w-[190px] gap-2 rounded-full font-semibold shadow-md active:scale-95"
         >
-          <Play size={20} fill="currentColor" />
+          <Play size={18} fill="currentColor" />
           <span>Phát toàn bộ set</span>
         </Button>
       </div>
 
       {/* Danh sách các track bên trong */}
       <div className="mt-4 flex flex-col gap-2">
-        <div className="flex items-center justify-between border-b border-zinc-900 pb-2 text-[11px] font-semibold tracking-wider text-zinc-500 uppercase">
+        <div className="flex items-center justify-between border-b border-zinc-900 pb-2 text-[11px] font-medium text-zinc-500 uppercase">
           <span>DANH SÁCH BÀI ({tracks.length})</span>
           <span>BẮT ĐẦU</span>
         </div>
 
         {tracks.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-850 p-8 text-center">
+          <div className="rounded-xl border border-dashed border-zinc-850 p-8 text-center">
             <p className="text-xs text-zinc-400">Set này chưa có danh sách bài.</p>
             <Button
               variant="secondary"
@@ -208,7 +197,7 @@ export default function MixDetailPage() {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col divide-y divide-zinc-900/60">
+          <div className="flex flex-col divide-y divide-zinc-900">
             {tracks.map((track, i) => {
               const isCurrentPlaying = isActiveMix && curIdx === i
               return (
@@ -216,44 +205,49 @@ export default function MixDetailPage() {
                   key={track.id ?? i}
                   onClick={() => handlePlayTrack(i)}
                   className={[
-                    'group flex min-h-[54px] w-full items-center gap-3.5 rounded-xl px-2.5 py-2 text-left transition-all active:scale-[0.99]',
-                    isCurrentPlaying
-                      ? 'border-l-2 border-white bg-zinc-900/70 text-white shadow-sm'
-                      : 'border-l-2 border-transparent text-zinc-300 hover:bg-zinc-950 hover:text-white',
+                    'flex min-h-[50px] w-full items-center gap-3 py-2.5 text-left transition-colors',
+                    isCurrentPlaying ? 'text-white' : 'text-zinc-400 hover:text-zinc-200',
                   ].join(' ')}
                 >
-                  {/* Số thứ tự hoặc Equalizer nhấp nháy */}
-                  <div className="flex w-6 shrink-0 items-center justify-center text-xs font-mono tabular-nums text-zinc-500">
-                    {isCurrentPlaying && isPlaying ? (
-                      <div className="flex items-end gap-[2px] h-3">
-                        <span className="w-1 bg-white animate-[pulse_0.6s_ease-in-out_infinite] h-3 rounded-full" />
-                        <span className="w-1 bg-white animate-[pulse_0.4s_ease-in-out_infinite] h-2 rounded-full" />
-                        <span className="w-1 bg-white animate-[pulse_0.8s_ease-in-out_infinite] h-2.5 rounded-full" />
-                      </div>
-                    ) : (
-                      <span className={isCurrentPlaying ? 'font-bold text-white' : ''}>
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                    )}
-                  </div>
+                  {/* Số thứ tự: chỉ in đậm hơn nếu đang phát */}
+                  <span
+                    className={[
+                      'w-6 shrink-0 text-xs font-mono tabular-nums',
+                      isCurrentPlaying ? 'font-bold text-white' : 'text-zinc-600',
+                    ].join(' ')}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
 
                   {/* Tên bài & Nghệ sĩ */}
                   <div className="min-w-0 flex-1">
                     <p
                       className={[
                         'truncate text-sm',
-                        isCurrentPlaying ? 'font-semibold text-white' : 'font-medium',
+                        isCurrentPlaying ? 'font-bold text-white' : 'font-normal',
                       ].join(' ')}
                     >
                       {track.name}
                     </p>
                     {track.artist && (
-                      <p className="truncate text-xs text-zinc-500">{track.artist}</p>
+                      <p
+                        className={[
+                          'truncate text-xs',
+                          isCurrentPlaying ? 'text-zinc-300' : 'text-zinc-600',
+                        ].join(' ')}
+                      >
+                        {track.artist}
+                      </p>
                     )}
                   </div>
 
-                  {/* Mốc thời gian bắt đầu */}
-                  <span className="shrink-0 text-xs font-mono tabular-nums text-zinc-500">
+                  {/* Thời gian bắt đầu */}
+                  <span
+                    className={[
+                      'shrink-0 text-xs font-mono tabular-nums',
+                      isCurrentPlaying ? 'text-zinc-300' : 'text-zinc-600',
+                    ].join(' ')}
+                  >
                     {formatTime(track.start_seconds)}
                   </span>
                 </button>
@@ -338,7 +332,7 @@ function EditTracklistModal({ mix, isOpen, onClose, onSuccess }) {
       variant="opaque"
     >
       <Modal.Container placement="center" size="lg">
-        <Modal.Dialog className="flex max-h-[85vh] w-full max-w-lg flex-col rounded-3xl border border-zinc-800 bg-zinc-950 p-5 text-white shadow-2xl">
+        <Modal.Dialog className="flex max-h-[85vh] w-full max-w-lg flex-col rounded-2xl border border-zinc-800 bg-zinc-950 p-5 text-white shadow-2xl">
           <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
             <div>
               <h3 className="text-base font-semibold text-white">Cập nhật Tracklist CSV</h3>
@@ -346,7 +340,7 @@ function EditTracklistModal({ mix, isOpen, onClose, onSuccess }) {
             </div>
             <button
               onClick={onClose}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-900 hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 hover:text-white"
               aria-label="Đóng"
             >
               <X size={18} />
@@ -363,7 +357,7 @@ function EditTracklistModal({ mix, isOpen, onClose, onSuccess }) {
                 value={csvText}
                 onChange={(e) => setCsvText(e.target.value)}
                 placeholder={`name,artist,time\nWhere's Your Head At,Basement Jaxx,[00:03:44](url)\nShooting Stars,Bag Raiders,00:05:25`}
-                className="w-full rounded-2xl border border-zinc-850 bg-black p-3 font-mono text-xs text-white placeholder-zinc-700 focus:border-zinc-500 focus:outline-none"
+                className="w-full rounded-xl border border-zinc-850 bg-black p-3 font-mono text-xs text-white placeholder-zinc-700 focus:border-zinc-500 focus:outline-none"
               />
               <div className="flex items-center justify-between text-xs">
                 <button
@@ -389,7 +383,7 @@ function EditTracklistModal({ mix, isOpen, onClose, onSuccess }) {
             {parseResult && (
               <div className="flex flex-col gap-3">
                 {parseResult.errors.length > 0 && (
-                  <div className="rounded-2xl border border-red-900/60 bg-red-950/40 p-3">
+                  <div className="rounded-xl border border-red-900/60 bg-red-950/40 p-3">
                     <p className="flex items-center gap-1.5 text-xs font-semibold text-red-400">
                       <AlertCircle size={14} /> Có {parseResult.errors.length} lỗi:
                     </p>
@@ -415,7 +409,7 @@ function EditTracklistModal({ mix, isOpen, onClose, onSuccess }) {
                       </span>
                     </label>
 
-                    <div className="overflow-hidden rounded-2xl border border-zinc-850">
+                    <div className="overflow-hidden rounded-xl border border-zinc-850">
                       <div className="bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-400">
                         Đã chia được {parseResult.tracks.length} track:
                       </div>
@@ -446,7 +440,7 @@ function EditTracklistModal({ mix, isOpen, onClose, onSuccess }) {
             )}
 
             {saveError && (
-              <div className="rounded-2xl border border-red-900/60 bg-red-950/40 p-3 text-xs text-red-300">
+              <div className="rounded-xl border border-red-900/60 bg-red-950/40 p-3 text-xs text-red-300">
                 {saveError}
               </div>
             )}
