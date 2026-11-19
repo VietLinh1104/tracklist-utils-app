@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@heroui/react'
-import { ChevronRight, Disc3, Music, Play, Plus } from 'lucide-react'
+import { ChevronRight, Disc3, Music, Play, Plus, Radio } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { usePlayer } from '../player/PlayerProvider'
 import { formatTime } from '../lib/tracklist'
@@ -11,7 +11,7 @@ export default function LibraryPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const navigate = useNavigate()
-  const { playMix, mix: activeMix } = usePlayer()
+  const { playMix, mix: activeMix, isPlaying } = usePlayer()
 
   async function loadLibrary() {
     setLoading(true)
@@ -55,24 +55,37 @@ export default function LibraryPage() {
   }, [])
 
   if (loading) {
-    return <div className="flex items-center justify-center py-24 text-zinc-500 text-sm">Đang tải thư viện…</div>
+    return (
+      <div className="flex items-center justify-center py-24 text-sm text-zinc-500">
+        Đang tải thư viện…
+      </div>
+    )
   }
 
   if (error) {
-    return <div className="rounded-xl bg-zinc-900 p-4 text-xs text-red-400">{error}</div>
+    return (
+      <div className="rounded-2xl border border-red-900/60 bg-red-950/40 p-4 text-xs text-red-300">
+        {error}
+      </div>
+    )
   }
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-6">
+      {/* Tiêu đề trang & Nút Thêm mix */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">Thư viện</h2>
-          <p className="text-xs text-zinc-500">{mixes.length} set nhạc</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Thư viện</h1>
+          <p className="mt-0.5 text-xs text-zinc-400">
+            {mixes.length} set nhạc lưu trên đám mây
+          </p>
         </div>
         <Link to="/add-mix">
-          <Button className="min-h-[44px] gap-1.5" size="sm">
-            <Plus size={16} />
-            Thêm mix
+          <Button
+            className="min-h-[44px] gap-2 rounded-xl px-4 font-semibold shadow-md active:scale-95"
+          >
+            <Plus size={18} />
+            <span>Thêm mix</span>
           </Button>
         </Link>
       </div>
@@ -80,70 +93,93 @@ export default function LibraryPage() {
       {mixes.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="flex flex-col divide-y divide-zinc-900 border-t border-b border-zinc-900">
+        <div className="flex flex-col gap-3">
           {mixes.map((mix) => {
             const isPlayingThisMix = activeMix?.id === mix.id
             return (
               <div
                 key={mix.id}
-                className="group flex items-center justify-between gap-3 py-3 transition-colors hover:bg-zinc-950/60"
+                className={[
+                  'group relative flex items-center justify-between gap-3.5 rounded-2xl border p-3.5 transition-all active:scale-[0.99]',
+                  isPlayingThisMix
+                    ? 'border-zinc-700 bg-zinc-900/70 shadow-lg'
+                    : 'border-zinc-900 bg-zinc-950/60 hover:border-zinc-800 hover:bg-zinc-900/40',
+                ].join(' ')}
               >
-                {/* Chạm vào khu vực bên trái để mở Album xem chi tiết track */}
+                {/* Vùng bấm mở Album */}
                 <button
                   onClick={() => navigate(`/mix/${mix.id}`)}
-                  className="flex flex-1 items-center gap-3.5 text-left overflow-hidden min-h-[50px]"
+                  className="flex min-w-0 flex-1 items-center gap-3.5 text-left"
                 >
-                  {/* Icon đĩa nhạc */}
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-850 bg-zinc-950 shadow-inner">
+                  {/* Bìa đĩa vinyl nhỏ */}
+                  <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-900 to-black shadow-md">
                     <Disc3
-                      size={22}
+                      size={26}
                       className={
-                        isPlayingThisMix
+                        isPlayingThisMix && isPlaying
                           ? 'text-white animate-[spin_8s_linear_infinite]'
-                          : 'text-zinc-600'
+                          : 'text-zinc-500'
                       }
                     />
+                    {isPlayingThisMix && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-white" />
+                      </span>
+                    )}
                   </div>
 
-                  {/* Thông tin Set */}
-                  <div className="min-w-0 flex-1">
-                    <h3
-                      className={[
-                        'truncate text-sm font-medium',
-                        isPlayingThisMix ? 'text-white font-semibold' : 'text-zinc-200',
-                      ].join(' ')}
-                    >
-                      {mix.title}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-zinc-500">
+                  {/* Thông tin set */}
+                  <div className="min-w-0 flex-1 pr-1">
+                    <div className="flex items-center gap-2">
+                      <h3
+                        className={[
+                          'truncate text-sm font-semibold',
+                          isPlayingThisMix ? 'text-white' : 'text-zinc-200',
+                        ].join(' ')}
+                      >
+                        {mix.title}
+                      </h3>
+                      {isPlayingThisMix && (
+                        <span className="shrink-0 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                          Đang nghe
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs text-zinc-500">
                       {mix.trackCount > 0 ? `${mix.trackCount} bài` : 'Chưa chia bài'} ·{' '}
                       {formatTime(mix.duration_seconds)}
                     </p>
                   </div>
-
-                  <ChevronRight
-                    size={16}
-                    className="shrink-0 text-zinc-700 transition-transform group-hover:translate-x-0.5"
-                  />
                 </button>
 
-                {/* Nút phát nhanh cả set */}
-                <button
-                  onClick={async () => {
-                    // Lấy tracks rồi phát
-                    const { data } = await supabase
-                      .from('tracks_timed')
-                      .select('*')
-                      .eq('mix_id', mix.id)
-                      .order('start_seconds', { ascending: true })
-                    playMix(mix, data || [], 0)
-                  }}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-800 text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white hover:bg-zinc-900"
-                  aria-label={`Phát set ${mix.title}`}
-                  title="Phát ngay"
-                >
-                  <Play size={16} fill="currentColor" />
-                </button>
+                {/* Cụm nút bên phải */}
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <Button
+                    variant="secondary"
+                    isIconOnly
+                    className="h-11 w-11 rounded-full border border-zinc-800 text-zinc-300 transition-colors hover:text-white active:scale-90"
+                    onPress={async () => {
+                      const { data } = await supabase
+                        .from('tracks_timed')
+                        .select('*')
+                        .eq('mix_id', mix.id)
+                        .order('start_seconds', { ascending: true })
+                      playMix(mix, data || [], 0)
+                    }}
+                    aria-label={`Phát ngay ${mix.title}`}
+                  >
+                    <Play size={16} fill="currentColor" />
+                  </Button>
+
+                  <button
+                    onClick={() => navigate(`/mix/${mix.id}`)}
+                    className="flex h-11 w-8 items-center justify-center text-zinc-600 transition-colors group-hover:text-zinc-400"
+                    aria-label="Xem chi tiết"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
               </div>
             )
           })}
@@ -155,18 +191,22 @@ export default function LibraryPage() {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center gap-4 py-24 text-center">
-      <Music size={42} className="text-zinc-700" />
+    <div className="flex flex-col items-center gap-4 rounded-3xl border border-dashed border-zinc-850 p-10 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-500">
+        <Music size={28} />
+      </div>
       <div>
-        <p className="text-zinc-300 font-medium">Chưa có set nào trong thư viện.</p>
-        <p className="mt-1 text-xs text-zinc-500">
-          Tải lên set nhạc đầu tiên và chia tracklist để bắt đầu nghe.
+        <p className="text-base font-semibold text-zinc-200">
+          Chưa có set nào trong thư viện
+        </p>
+        <p className="mt-1 max-w-xs text-xs text-zinc-500 leading-relaxed">
+          Tải lên file mix dài đầu tiên và dán danh sách bài (CSV) để bắt đầu thưởng thức.
         </p>
       </div>
       <Link to="/add-mix">
-        <Button className="mt-2 min-h-[44px]">
-          <Plus size={16} />
-          Thêm mix đầu tiên
+        <Button className="mt-2 min-h-[44px] gap-2 rounded-xl px-5 font-semibold">
+          <Plus size={18} />
+          <span>Thêm mix đầu tiên</span>
         </Button>
       </Link>
     </div>
