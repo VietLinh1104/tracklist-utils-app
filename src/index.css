@@ -1,2 +1,16 @@
 @import "tailwindcss";
 @import "@heroui/styles";
+
+/* Ẩn hoàn toàn thanh scrollbar trên mọi thiết bị và trình duyệt nhưng vẫn giữ nguyên khả năng cuộn */
+html,
+body,
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, iOS WebKit */
+  width: 0;
+  height: 0;
+}

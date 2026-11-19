@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext'
 import { PlayerProvider } from './player/PlayerProvider'
 import LoginPage from './pages/LoginPage'
 import LibraryPage from './pages/LibraryPage'
+import MixDetailPage from './pages/MixDetailPage'
 import AddMixPage from './pages/AddMixPage'
 import AppShell from './components/AppShell'
 
@@ -30,6 +31,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<AppShell />}>
             <Route index element={<LibraryPage />} />
+            <Route path="mix/:id" element={<MixDetailPage />} />
             <Route path="add-mix" element={<AddMixPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
