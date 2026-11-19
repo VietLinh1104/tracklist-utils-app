@@ -96,7 +96,9 @@ export default function FullPlayer({ isOpen, onClose }) {
           className="flex h-full flex-col bg-black text-white"
           style={{
             paddingTop: 'env(safe-area-inset-top, 0px)',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            paddingLeft: 'env(safe-area-inset-left, 0px)',
+            paddingRight: 'env(safe-area-inset-right, 0px)',
           }}
           aria-label="Full player"
         >
